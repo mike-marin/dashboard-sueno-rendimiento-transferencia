@@ -3,6 +3,7 @@
 Dashboard - Actividad de Transferencia: Sueño, Estrés y Rendimiento Académico
 Programación para Ciencia de Datos II - Fundación Universitaria Compensar
 
+Identidad Visual: Neuro-Circadian Analytics & Deep Slate
 Autor: Michael Marín Herrera (mmarinh@ucompensar.edu.co)
 Docente: William Eduardo Clavijo Bohorquez
 """
@@ -22,7 +23,7 @@ from sklearn.linear_model import LinearRegression, Ridge, LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     r2_score, mean_squared_error, mean_absolute_error,
-    confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+    confusion_matrix, accuracy_score, precision_score, recall_score
 )
 from sklearn.preprocessing import StandardScaler
 
@@ -38,16 +39,14 @@ if not os.path.exists(DATA_PATH):
 
 df = pd.read_csv(DATA_PATH)
 
-# Estandarización de nombres si difieren
-column_map = {
+# Homologación de nombres de columnas
+col_map = {
     'horas_sueno_promedio': 'horas_sueno',
     'horas_estudio_semanales': 'horas_estudio',
     'nivel_estres_1_10': 'nivel_estres',
     'puntaje_rendimiento': 'puntaje'
 }
-for col, new_col in column_map.items():
-    if col in df.columns:
-        df = df.rename(columns={col: new_col})
+df = df.rename(columns=col_map)
 
 FEATURES = ['horas_sueno', 'horas_estudio', 'nivel_estres']
 TARGET = 'puntaje'
@@ -56,24 +55,9 @@ mediana_puntaje = float(df[TARGET].median())
 mediana_sueno = float(df['horas_sueno'].median())
 df['en_riesgo'] = (df[TARGET] <= mediana_puntaje).astype(int)
 
-# Identificar outlier clínico (ID 9: puntaje 22 pts, |z| > 2.5)
+# Detección de atípico clínico (|z| > 2.5 -> ID 9)
 z_scores = np.abs(stats.zscore(df[TARGET]))
 outlier_idx = df.index[z_scores > 2.5].tolist()
-
-# Paleta de colores: Emerald Clinical & Slate Minimalist
-PALETA = {
-    "primario": "#059669",     # Verde Esmeralda Institucional
-    "primario_light": "#ECFDF5", # Esmeralda suave
-    "secundario": "#0EA5E9",   # Azul Turquesa / Sky
-    "acento": "#6366F1",       # Índigo
-    "exito": "#10B981",        # Esmeralda éxito
-    "peligro": "#EF4444",      # Rojo riesgo
-    "warning": "#F59E0B",      # Ámbar
-    "fondo": "#F8FAFC",        # Slate 50
-    "texto": "#0F172A",        # Slate 900
-    "muted": "#64748B",        # Slate 500
-    "border": "#E2E8F0"
-}
 
 # ---------------------------------------------------------------------------
 # 2. MODELOS BASE DE REFERENCIA
@@ -93,38 +77,57 @@ r2_multiple = float(r2_score(y_full, modelo_multiple_ref.predict(X_full)))
 modelo_logit_ref = LogisticRegression(C=1.0, random_state=42).fit(X_full, df['en_riesgo'])
 
 # ---------------------------------------------------------------------------
-# 3. FUNCIONES AUXILIARES DE DISEÑO
+# 3. PALETA CIRCADIAN & HELPERS VISUALES
 # ---------------------------------------------------------------------------
 
-def kpi_card(titulo, valor, subtitulo, color):
-    return dbc.Card(
-        dbc.CardBody([
-            html.Div(titulo, className="kpi-titulo"),
-            html.Div(valor, className="kpi-valor", style={"color": color}),
-            html.Div(subtitulo, className="kpi-subtitulo"),
-        ]),
-        className="kpi-card shadow-sm",
-        style={"--kpi-color": color}
-    )
+THEME = {
+    "midnight": "#0F172A",
+    "deep_space": "#1E1B4B",
+    "cyan": "#06B6D4",
+    "teal": "#0D9488",
+    "violet": "#6366F1",
+    "coral": "#F43F5E",
+    "amber": "#F59E0B",
+    "emerald": "#10B981",
+    "text": "#0F172A",
+    "muted": "#64748B",
+    "card_bg": "#FFFFFF",
+    "grid": "#F1F5F9"
+}
 
-def figura_base(fig, titulo=None):
+def neuro_kpi(titulo, valor, subtitulo, icon_class, icon_bg, icon_color, badge_text=None, badge_bg=None, badge_color=None):
+    return html.Div([
+        html.Div([
+            html.Div([
+                html.I(className=f"{icon_class}", style={"color": icon_color})
+            ], className="kpi-icon-pill", style={"backgroundColor": icon_bg}),
+            html.Span(badge_text, className="kpi-badge-indicator", style={"backgroundColor": badge_bg or "#F1F5F9", "color": badge_color or "#475569"}) if badge_text else None
+        ], className="kpi-header-row"),
+        html.Div([
+            html.Div(valor, className="kpi-number-display"),
+            html.P(titulo, className="kpi-label-text"),
+            html.Div(subtitulo, className="kpi-footer-subtext")
+        ])
+    ], className="neuro-kpi-card")
+
+def chart_styler(fig, titulo=None):
     fig.update_layout(
         template="plotly_white",
-        font=dict(family="Plus Jakarta Sans, -apple-system, sans-serif", size=12, color=PALETA["texto"]),
-        margin=dict(l=50, r=30, t=65 if titulo else 25, b=45),
+        font=dict(family="Outfit, -apple-system, sans-serif", size=12, color=THEME["text"]),
+        margin=dict(l=45, r=25, t=55 if titulo else 20, b=40),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.01, font=dict(size=11, color=PALETA["muted"])),
-        hoverlabel=dict(bgcolor=PALETA["texto"], font_size=12, font_family="Plus Jakarta Sans", font_color="white"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.01, font=dict(size=11, color=THEME["muted"])),
+        hoverlabel=dict(bgcolor=THEME["midnight"], font_size=12, font_family="Outfit", font_color="white"),
     )
-    fig.update_xaxes(showgrid=True, gridcolor="#F1F5F9", zerolinecolor="#E2E8F0")
-    fig.update_yaxes(showgrid=True, gridcolor="#F1F5F9", zerolinecolor="#E2E8F0")
+    fig.update_xaxes(showgrid=True, gridcolor=THEME["grid"], zerolinecolor="#CBD5E1")
+    fig.update_yaxes(showgrid=True, gridcolor=THEME["grid"], zerolinecolor="#CBD5E1")
     if titulo:
-        fig.update_layout(title=dict(text=f"<b>{titulo}</b>", x=0.01, y=0.98, font=dict(size=14, color=PALETA["texto"])))
+        fig.update_layout(title=dict(text=f"<b>{titulo}</b>", x=0.01, y=0.98, font=dict(size=14, color=THEME["midnight"], family="Space Grotesk, sans-serif")))
     return fig
 
 # ---------------------------------------------------------------------------
-# 4. INICIALIZACIÓN DE LA APP (COMPATIBLE CON BINDER & LOCAL)
+# 4. INICIALIZACIÓN DE LA APP (COMPATIBLE CON BINDER & JUPYTERHUB)
 # ---------------------------------------------------------------------------
 
 jupyterhub_prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "")
@@ -139,128 +142,176 @@ app = dash.Dash(
     routes_pathname_prefix="/",
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
-        "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
+        "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap",
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     ],
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
-    title="Dashboard | Sueño & Rendimiento Académico",
+    title="Neuro-Analytics | Sueño y Rendimiento Académico",
 )
 server = app.server
 
 # ---------------------------------------------------------------------------
-# 5. LAYOUT — ENCABEZADO
+# 5. HEADER / HERO SECTION
 # ---------------------------------------------------------------------------
 
-encabezado = dbc.Navbar(
-    dbc.Container([
-        html.Div([
-            html.Div([
-                html.I(className="fa-solid fa-brain me-2 fs-4", style={"color": PALETA["primario"]}),
-                html.H4("Sueño, Estrés y Rendimiento Académico", className="text-white d-inline-block fw-bold align-middle mb-0"),
-                html.Span("TRANSFERENCIA UCOMPENSAR", className="brand-badge ms-3 align-middle")
-            ], className="d-flex align-items-center mb-1"),
-            html.Small("Programación para Ciencia de Datos II · Autor: Michael Marín Herrera · Docente: William Eduardo Clavijo Bohorquez",
-                       className="text-white-50 font-monospace")
-        ])
-    ], fluid=True),
-    className="app-header mb-4",
-    dark=True,
-)
-
-# ---------------------------------------------------------------------------
-# 5.1 PESTAÑA — CONTEXTO & RESUMEN
-# ---------------------------------------------------------------------------
-
-tab_contexto = dbc.Container([
+hero_header = html.Div([
     dbc.Row([
-        dbc.Col(kpi_card("Muestra Estudiantil", f"{len(df)} estudiantes", "Dataset universitario", PALETA["primario"]), md=3),
-        dbc.Col(kpi_card("Sueño Promedio", f"{df['horas_sueno'].mean():.2f} hrs", f"Mediana: {mediana_sueno:.2f} hrs", PALETA["secundario"]), md=3),
-        dbc.Col(kpi_card("Correlación Sueño–Nota", f"r = {r_pearson:+.2f}", "Asociación directa moderada", PALETA["exito"]), md=3),
-        dbc.Col(kpi_card("Caso Atípico Detectado", f"{len(outlier_idx)} caso", "ID 9 (Puntaje 22 pts, |z|>2.5)", PALETA["peligro"]), md=3),
+        dbc.Col([
+            html.Div([
+                html.I(className="fa-solid fa-dna me-1"),
+                html.Span("Estudio Neurocognitivo & Bienestar Universitario")
+            ], className="hero-tag"),
+            html.H1("Impacto del Sueño y Estrés en el Rendimiento Académico", className="hero-title"),
+            html.P("Plataforma analítica e interactiva para la modelación predictiva, contraste de hipótesis y diagnóstico de riesgo estudiantil.", className="hero-subtitle")
+        ], md=8),
+        dbc.Col([
+            html.Div([
+                html.Div("ACTIVIDAD DE TRANSFERENCIA", className="small fw-bold text-uppercase", style={"color": "#67E8F9", "letterSpacing": "0.06em"}),
+                html.Div("Michael Marín Herrera", className="fs-6 fw-bold text-white mt-1"),
+                html.Small("mmarinh@ucompensar.edu.co", className="text-white-50 font-monospace d-block"),
+                html.Small("Docente: William E. Clavijo Bohorquez", className="text-white-50 mt-1 d-block")
+            ], className="hero-author-badge")
+        ], md=4, className="d-flex justify-content-md-end align-items-center mt-3 mt-md-0")
+    ])
+], className="neuro-hero")
+
+# ---------------------------------------------------------------------------
+# 5.1 PESTAÑA 1: CONTEXTO & RESUMEN
+# ---------------------------------------------------------------------------
+
+tab_contexto = html.Div([
+    dbc.Row([
+        dbc.Col(neuro_kpi(
+            "Muestra Analizada", f"{len(df)} Estudiantes", "Población universitaria",
+            "fa-solid fa-users", "#EEF2FF", THEME["violet"], "Dataset 2026", "#E0E7FF", "#4338CA"
+        ), md=3),
+        dbc.Col(neuro_kpi(
+            "Media de Sueño", f"{df['horas_sueno'].mean():.2f} hrs/día", f"Mediana: {mediana_sueno:.2f} hrs",
+            "fa-solid fa-moon", "#ECFEFF", THEME["cyan"], "Hábito", "#CFFAFE", "#0E7490"
+        ), md=3),
+        dbc.Col(neuro_kpi(
+            "Correlación r", f"r = {r_pearson:+.2f}", "Asociación directa positiva",
+            "fa-solid fa-bolt", "#F0FDF4", THEME["emerald"], "Fuerza Media", "#DCFCE7", "#15803D"
+        ), md=3),
+        dbc.Col(neuro_kpi(
+            "Caso Atípico", f"{len(outlier_idx)} Estudiante", "ID 9 (22 pts, |z| > 2.5)",
+            "fa-solid fa-triangle-exclamation", "#FFF1F2", THEME["coral"], "Alerta Outlier", "#FFE4E6", "#BE123C"
+        ), md=3),
     ], className="g-3 mb-4"),
 
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody([
             html.Div([
-                html.I(className="fa-solid fa-bullseye me-2", style={"color": PALETA["primario"]}),
-                html.Span("Planteamiento del Estudio", className="card-title-modern")
-            ], className="d-flex align-items-center mb-3"),
-            html.P("El departamento de Bienestar Universitario analiza cómo los hábitos del sueño, el tiempo de estudio independiente y la carga de estrés psicológico impactan el desempeño académico de los estudiantes de educación superior.", className="text-secondary"),
-            html.P("A través de este dashboard interactivo, se evalúan tres metodologías rigurosas de ciencia de datos: Análisis Exploratorio con detección de atípicos, Contraste de Hipótesis formal (Welch t-test y Mann-Whitney U), y Modelado Predictivo (Regresión Múltiple/Ridge y Clasificación Logística de Riesgo).", className="text-secondary"),
+                html.I(className="fa-solid fa-brain me-2", style={"color": THEME["teal"]}),
+                html.Span("Fundamentación del Problema", className="panel-header-badge")
+            ], className="mb-3"),
+            html.P("El descanso nocturno y el manejo de estresores representan factores determinantes en la consolidación de la memoria y la capacidad de resolución analítica en estudiantes de educación superior.", className="text-secondary"),
+            html.P("Este entorno integra el ciclo metodológico formal de Ciencia de Datos: Exploración de distribuciones y atípicos, Contraste de Hipótesis poblacional (Welch t-test y Mann-Whitney U), Regresión Múltiple/Ridge y Clasificación Logística con Simulador de Riesgo en tiempo real.", className="text-secondary"),
             html.Hr(className="my-3 text-muted"),
-            html.H6("Variables del Estudio", className="fw-bold mb-2 text-dark"),
-            html.Ul([
-                html.Li([html.B("horas_sueno: ", className="text-dark"), "Horas promedio de sueño diario por estudiante (hrs/día)."]),
-                html.Li([html.B("horas_estudio: ", className="text-dark"), "Horas dedicadas al estudio independiente por semana."]),
-                html.Li([html.B("nivel_estres: ", className="text-dark"), "Escala autopercibida de estrés académico (1 a 10)."]),
-                html.Li([html.B("puntaje: ", className="text-dark"), "Calificación obtenida en el examen estandarizado (0 a 100 pts)."]),
-            ], className="text-secondary mb-0 ps-3"),
+            html.H6("Variables Estudiadas", className="fw-bold mb-2 text-dark"),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.Span("🌙 horas_sueno: ", className="fw-bold text-dark"),
+                        html.Span("Promedio diario de descanso nocturno (horas/día).", className="text-muted small")
+                    ], className="mb-2"),
+                    html.Div([
+                        html.Span("📚 horas_estudio: ", className="fw-bold text-dark"),
+                        html.Span("Tiempo semanal de preparación académica individual.", className="text-muted small")
+                    ], className="mb-2"),
+                ], md=6),
+                dbc.Col([
+                    html.Div([
+                        html.Span("⚡ nivel_estres: ", className="fw-bold text-dark"),
+                        html.Span("Índice de sobrecarga autopercibida (escala 1 a 10).", className="text-muted small")
+                    ], className="mb-2"),
+                    html.Div([
+                        html.Span("🎯 puntaje: ", className="fw-bold text-dark"),
+                        html.Span("Calificación estandarizada final (0 a 100 puntos).", className="text-muted small")
+                    ], className="mb-2"),
+                ], md=6),
+            ])
         ])), md=7),
+
         dbc.Col(dbc.Card(dbc.CardBody([
             html.Div([
-                html.I(className="fa-solid fa-compass me-2", style={"color": PALETA["primario"]}),
-                html.Span("Estructura de la Plataforma", className="card-title-modern")
-            ], className="d-flex align-items-center mb-3"),
-            html.Ol([
-                html.Li([html.B("Exploración: "), "Distribución de notas, correlaciones dinámicas y filtro de casos atípicos."]),
-                html.Li([html.B("Contraste de hipótesis: "), "Comparación estadística formal entre estudiantes de alto vs. bajo sueño."]),
-                html.Li([html.B("Regresión Múltiple: "), "Modelos lineales, regularización Ridge y evaluación de $R^2$ y RMSE."]),
-                html.Li([html.B("Diagnóstico & Simulador: "), "Calculadora en tiempo real y modelo logístico de alerta temprana."]),
-            ], className="text-secondary ps-3 mb-3"),
+                html.I(className="fa-solid fa-compass me-2", style={"color": THEME["cyan"]}),
+                html.Span("Módulos de la Plataforma", className="panel-header-badge")
+            ], className="mb-3"),
             html.Div([
-                html.I(className="fa-solid fa-lightbulb me-2 text-warning"),
-                html.Small("Ajuste los controles interactivos en cada pestaña para recalcular modelos y contrastes en vivo.", className="text-muted")
-            ], className="p-2 rounded bg-light border d-flex align-items-center"),
+                html.Div([
+                    html.Span("1", className="badge bg-dark rounded-circle me-2"),
+                    html.B("Exploración (EDA): "), "Filtro dinámico de sueño y visualización bivariada."
+                ], className="mb-2 text-secondary"),
+                html.Div([
+                    html.Span("2", className="badge bg-dark rounded-circle me-2"),
+                    html.B("Contraste de Hipótesis: "), "Prueba de impacto de alto descanso con Welch t y MW-U."
+                ], className="mb-2 text-secondary"),
+                html.Div([
+                    html.Span("3", className="badge bg-dark rounded-circle me-2"),
+                    html.B("Regresión & Ridge: "), "Ajuste multivariado, evaluación R² y penalización L2."
+                ], className="mb-2 text-secondary"),
+                html.Div([
+                    html.Span("4", className="badge bg-dark rounded-circle me-2"),
+                    html.B("Simulador & Diagnóstico: "), "Calculadora de notas y probabilidad de alerta académica."
+                ], className="mb-3 text-secondary"),
+            ]),
+            html.Div([
+                html.I(className="fa-solid fa-wand-magic-sparkles me-2", style={"color": THEME["amber"]}),
+                html.Small("Interactúa con los controles para simular escenarios y contrastar hipótesis en vivo.", className="text-muted")
+            ], className="p-2 rounded bg-light border d-flex align-items-center")
         ])), md=5),
     ], className="g-3"),
-], fluid=True, className="py-2")
+])
 
 # ---------------------------------------------------------------------------
-# 5.2 PESTAÑA — EXPLORACIÓN DE DATOS (EDA)
+# 5.2 PESTAÑA 2: EXPLORACIÓN DE DATOS (EDA)
 # ---------------------------------------------------------------------------
 
 min_s, max_s = float(df['horas_sueno'].min()), float(df['horas_sueno'].max())
 
-tab_exploracion = dbc.Container([
-    dbc.Row([
-        dbc.Col([
-            html.Div([
-                html.Label("Filtro por Rango de Horas de Sueño:", className="fw-semibold mb-0 me-2"),
-                html.Span(id="badge-rango-sueno", className="badge px-3 py-1 rounded-pill shadow-sm", style={"backgroundColor": PALETA["primario"], "color": "#FFFFFF", "fontSize": "0.85rem", "fontWeight": "600"})
-            ], className="d-flex align-items-center mb-2"),
-            dcc.RangeSlider(
-                id="slider-rango-sueno",
-                min=np.floor(min_s), max=np.ceil(max_s), step=0.5,
-                value=[np.floor(min_s), np.ceil(max_s)],
-                marks={i: f"{i} hrs" for i in range(int(np.floor(min_s)), int(np.ceil(max_s)) + 1)},
-                tooltip={"placement": "bottom", "always_visible": False},
-            ),
-        ], md=7),
-        dbc.Col([
-            html.Label("Tratamiento de Valores Atípicos", className="fw-semibold mb-2"),
-            dcc.Checklist(
-                id="chk-outliers-eda",
-                options=[{"label": " Resaltar estudiante atípico (ID 9, Puntaje=22 pts)", "value": "resaltar"}],
-                value=["resaltar"],
-                className="mt-1 text-secondary",
-            ),
-        ], md=5),
-    ], className="mb-4 g-3 p-3 bg-white rounded-3 border"),
+tab_exploracion = html.Div([
+    html.Div([
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    html.Label("Filtro Interactivo de Horas de Sueño:", className="fw-bold mb-0 me-2 small"),
+                    html.Span(id="badge-rango-sueno", className="badge px-3 py-1 rounded-pill", style={"backgroundColor": THEME["midnight"], "color": "#67E8F9"})
+                ], className="d-flex align-items-center mb-2"),
+                dcc.RangeSlider(
+                    id="slider-rango-sueno",
+                    min=np.floor(min_s), max=np.ceil(max_s), step=0.5,
+                    value=[np.floor(min_s), np.ceil(max_s)],
+                    marks={i: f"{i} hrs" for i in range(int(np.floor(min_s)), int(np.ceil(max_s)) + 1)},
+                    tooltip={"placement": "bottom", "always_visible": False},
+                ),
+            ], md=7),
+            dbc.Col([
+                html.Label("Tratamiento del Caso Atípico", className="fw-bold mb-2 small"),
+                dcc.Checklist(
+                    id="chk-outliers-eda",
+                    options=[{"label": " Destacar Estudiante ID 9 (Puntaje = 22 pts)", "value": "resaltar"}],
+                    value=["resaltar"],
+                    className="text-secondary small mt-1",
+                ),
+            ], md=5),
+        ], className="g-3 align-items-center")
+    ], className="control-drawer mb-4"),
 
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(dcc.Graph(id="graf-histograma-eda"))), md=6),
         dbc.Col(dbc.Card(dbc.CardBody([
             html.Div([
-                html.Label("Colorear dispersión por:", className="fw-semibold me-2 mb-0 small"),
+                html.Label("Segmentar color por:", className="fw-bold me-2 mb-0 small"),
                 dcc.Dropdown(
                     id="dd-color-eda",
                     options=[
-                        {"label": "Nivel de Estrés (1 a 10)", "value": "nivel_estres"},
-                        {"label": "Horas de Estudio Semanales", "value": "horas_estudio"},
+                        {"label": "⚡ Nivel de Estrés (1 al 10)", "value": "nivel_estres"},
+                        {"label": "📚 Horas de Estudio Semanales", "value": "horas_estudio"},
                     ],
                     value="nivel_estres",
                     clearable=False,
-                    style={"width": "220px", "fontSize": "0.85rem"}
+                    style={"width": "230px", "fontSize": "0.85rem"}
                 )
             ], className="d-flex align-items-center justify-content-between mb-2"),
             dcc.Graph(id="graf-dispersion-eda")
@@ -270,29 +321,33 @@ tab_exploracion = dbc.Container([
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(id="resumen-estadistico-eda")), md=12),
     ], className="g-3 mt-1"),
-], fluid=True, className="py-2")
+])
 
 # ---------------------------------------------------------------------------
-# 5.3 PESTAÑA — CONTRASTE DE HIPÓTESIS
+# 5.3 PESTAÑA 3: CONTRASTE DE HIPÓTESIS
 # ---------------------------------------------------------------------------
 
-tab_hipotesis = dbc.Container([
+tab_hipotesis = html.Div([
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody([
-            html.H5("Formulación de Hipótesis", className="card-title-modern mb-3"),
             html.Div([
-                html.P([html.Span("H₀: ", className="fw-bold text-danger"), "μ_alto ≤ μ_bajo (Dormir más no incrementa el puntaje promedio)"]),
-                html.P([html.Span("H₁: ", className="fw-bold text-success"), "μ_alto > μ_bajo (Dormir más incrementa sustancialmente el puntaje)"]),
+                html.I(className="fa-solid fa-scale-balanced me-2", style={"color": THEME["violet"]}),
+                html.Span("Formulación de Hipótesis", className="panel-header-badge")
+            ], className="mb-3"),
+            html.Div([
+                html.P([html.Span("H₀: ", className="fw-bold text-danger"), "μ_alto ≤ μ_bajo (Dormir más no aumenta significativamente la media de calificaciones)"], className="small mb-2"),
+                html.P([html.Span("H₁: ", className="fw-bold text-success"), "μ_alto > μ_bajo (Dormir más incrementa sustancialmente el rendimiento académico)"], className="small mb-0"),
             ], className="p-3 bg-light rounded border mb-3"),
-            html.Label("Corte de grupo por percentil de sueño:", className="fw-semibold mb-1 small"),
+            
+            html.Label("Percentil de cohorte de sueño:", className="fw-bold mb-1 small"),
             dcc.Slider(
                 id="slider-percentil-hip",
                 min=20, max=80, step=5, value=50,
-                marks={25: "P25", 50: "Mediana (P50)", 75: "P75"},
+                marks={25: "P25", 50: "Mediana", 75: "P75"},
                 tooltip={"placement": "bottom", "always_visible": True}
             ),
             html.Div([
-                html.Label("Nivel de significancia (α):", className="fw-semibold mb-1 mt-3 small"),
+                html.Label("Nivel de significancia (α):", className="fw-bold mb-1 mt-3 small"),
                 dcc.RadioItems(
                     id="radio-alpha-hip",
                     options=[
@@ -305,67 +360,70 @@ tab_hipotesis = dbc.Container([
                 ),
             ]),
             html.Div([
-                html.Label("Filtro de caso atípico (ID 9):", className="fw-semibold mb-1 mt-3 small"),
+                html.Label("Manejo de outlier (ID 9):", className="fw-bold mb-1 mt-3 small"),
                 dcc.RadioItems(
                     id="radio-outlier-hip",
                     options=[
-                        {"label": " Incluir outlier (Dataset completo)", "value": "con"},
-                        {"label": " Excluir outlier (Prueba de robustez)", "value": "sin"},
+                        {"label": " Incluir atípico (N=70)", "value": "con"},
+                        {"label": " Excluir atípico (Prueba Robusta N=69)", "value": "sin"},
                     ],
                     value="con",
                     className="text-secondary small",
                 ),
             ], className="pt-2 border-top mt-3"),
         ])), md=4),
+
         dbc.Col(dbc.Card(dbc.CardBody(dcc.Graph(id="graf-boxplot-hip"))), md=8),
     ], className="g-3 mb-3"),
 
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(id="resultado-hipotesis-box")), md=12),
     ], className="g-3"),
-], fluid=True, className="py-2")
+])
 
 # ---------------------------------------------------------------------------
-# 5.4 PESTAÑA — REGRESIÓN & MODELADO
+# 5.4 PESTAÑA 4: REGRESIÓN & MODELADO
 # ---------------------------------------------------------------------------
 
-tab_regresion = dbc.Container([
-    dbc.Row([
-        dbc.Col([
-            html.Label("Selección de Modelo de Regresión", className="fw-semibold mb-2"),
-            dcc.Dropdown(
-                id="dd-modelo-reg",
-                options=[
-                    {"label": "Regresión Lineal Simple (Solo Horas de Sueño)", "value": "simple"},
-                    {"label": "Regresión Lineal Múltiple (Sueño + Estudio + Estrés)", "value": "multiple"},
-                    {"label": "Regresión Regularizada Ridge (L2 Penalization)", "value": "ridge"},
-                ],
-                value="multiple",
-                clearable=False,
-            ),
-        ], md=5),
-        dbc.Col([
-            html.Label("Tamaño del Conjunto de Prueba (Test Split):", className="fw-semibold mb-2"),
-            dcc.Slider(
-                id="slider-split-reg",
-                min=0.1, max=0.4, step=0.05, value=0.2,
-                marks={0.1: "10%", 0.2: "20%", 0.3: "30%", 0.4: "40%"},
-                tooltip={"placement": "bottom", "always_visible": False}
-            ),
-        ], md=4),
-        dbc.Col([
-            html.Label("Tratamiento de Outlier:", className="fw-semibold mb-2"),
-            dcc.RadioItems(
-                id="radio-outlier-reg",
-                options=[
-                    {"label": " Con outlier (N=70)", "value": "con"},
-                    {"label": " Sin outlier (N=69)", "value": "sin"},
-                ],
-                value="con",
-                className="text-secondary pt-1",
-            ),
-        ], md=3),
-    ], className="mb-4 g-3 p-3 bg-white rounded-3 border"),
+tab_regresion = html.Div([
+    html.Div([
+        dbc.Row([
+            dbc.Col([
+                html.Label("Algoritmo de Regresión:", className="fw-bold mb-1 small"),
+                dcc.Dropdown(
+                    id="dd-modelo-reg",
+                    options=[
+                        {"label": "Regresión Lineal Simple (Solo Horas de Sueño)", "value": "simple"},
+                        {"label": "Regresión Lineal Múltiple (Sueño + Estudio + Estrés)", "value": "multiple"},
+                        {"label": "Regresión Regularizada Ridge (Penalización L2)", "value": "ridge"},
+                    ],
+                    value="multiple",
+                    clearable=False,
+                ),
+            ], md=5),
+            dbc.Col([
+                html.Label("Partición de Prueba (Test Split):", className="fw-bold mb-1 small"),
+                dcc.Slider(
+                    id="slider-split-reg",
+                    min=0.1, max=0.4, step=0.05, value=0.2,
+                    marks={0.1: "10%", 0.2: "20%", 0.3: "30%", 0.4: "40%"},
+                    tooltip={"placement": "bottom", "always_visible": False}
+                ),
+            ], md=4),
+            dbc.Col([
+                html.Label("Filtro de Caso Atípico:", className="fw-bold mb-1 small"),
+                dcc.RadioItems(
+                    id="radio-outlier-reg",
+                    options=[
+                        {"label": " Con outlier (N=70)", "value": "con"},
+                        {"label": " Sin outlier (N=69)", "value": "sin"},
+                    ],
+                    value="con",
+                    className="text-secondary small pt-1",
+                ),
+            ], md=3),
+        ], className="g-3 align-items-center")
+    ], className="control-drawer mb-4"),
 
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(dcc.Graph(id="graf-regresion-pred"))), md=7),
@@ -375,84 +433,83 @@ tab_regresion = dbc.Container([
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(id="metricas-regresion-card")), md=12),
     ], className="g-3 mt-1"),
-], fluid=True, className="py-2")
+])
 
 # ---------------------------------------------------------------------------
-# 5.5 PESTAÑA — DIAGNÓSTICO & SIMULADOR INDIVIDUAL
+# 5.5 PESTAÑA 5: SIMULADOR INDIVIDUAL & DIAGNÓSTICO
 # ---------------------------------------------------------------------------
 
-tab_simulador = dbc.Container([
+tab_simulador = html.Div([
     dbc.Row([
-        # Simulador interactivo individual
-        dbc.Col(dbc.Card(dbc.CardBody([
+        # Calculadora interactiva
+        dbc.Col(html.Div([
             html.Div([
-                html.I(className="fa-solid fa-sliders me-2", style={"color": PALETA["primario"]}),
-                html.Span("Simulador de Rendimiento y Riesgo Individual", className="card-title-modern")
-            ], className="d-flex align-items-center mb-3"),
-            html.P("Ingrese el perfil de hábitos de un estudiante para predecir su puntaje esperado y clasificar su riesgo de bajo desempeño:", className="text-secondary small"),
+                html.I(className="fa-solid fa-sliders me-2", style={"color": THEME["teal"]}),
+                html.Span("Simulador de Rendimiento Individual", className="panel-header-badge")
+            ], className="mb-3"),
+            html.P("Ajuste los hábitos individuales de un estudiante para obtener la estimación en vivo de su calificación y el nivel de riesgo académico:", className="text-secondary small mb-3"),
 
-            html.Label("Horas de sueño diarias:", className="fw-semibold mt-2 small"),
-            dcc.Slider(id="sim-sueno", min=3.0, max=10.0, step=0.25, value=7.0,
+            html.Label("🌙 Horas diarias de sueño:", className="fw-bold mt-1 small"),
+            dcc.Slider(id="sim-sueno", min=3.0, max=10.0, step=0.25, value=7.25,
                        marks={3: "3h", 5: "5h", 7: "7h", 8: "8h", 10: "10h"},
                        tooltip={"placement": "bottom", "always_visible": True}),
 
-            html.Label("Horas de estudio semanales:", className="fw-semibold mt-3 small"),
-            dcc.Slider(id="sim-estudio", min=0.0, max=30.0, step=1.0, value=12.0,
+            html.Label("📚 Horas de estudio autónomo por semana:", className="fw-bold mt-3 small"),
+            dcc.Slider(id="sim-estudio", min=0.0, max=30.0, step=1.0, value=14.0,
                        marks={0: "0h", 10: "10h", 20: "20h", 30: "30h"},
                        tooltip={"placement": "bottom", "always_visible": True}),
 
-            html.Label("Nivel de estrés autopercibido (1 al 10):", className="fw-semibold mt-3 small"),
+            html.Label("⚡ Nivel de estrés académico (1 al 10):", className="fw-bold mt-3 small"),
             dcc.Slider(id="sim-estres", min=1, max=10, step=1, value=5,
-                       marks={1: "1 (Bajo)", 5: "5 (Medio)", 10: "10 (Alto)"},
+                       marks={1: "1 (Bajo)", 5: "5 (Medio)", 10: "10 (Severo)"},
                        tooltip={"placement": "bottom", "always_visible": True}),
 
             html.Hr(className="my-3"),
             html.Div(id="resultado-simulador-card")
-        ])), md=6),
+        ], className="simulator-box h-100"), md=6),
 
         # Modelo Logístico y Curva Sigmoide
         dbc.Col(dbc.Card(dbc.CardBody([
             html.Div([
-                html.I(className="fa-solid fa-shield-halved me-2", style={"color": PALETA["secundario"]}),
-                html.Span("Modelo Logístico de Riesgo Académico", className="card-title-modern")
-            ], className="d-flex align-items-center mb-3"),
-            html.P(f"El riesgo se define para puntajes por debajo de la mediana poblacional ({mediana_puntaje:.1f} pts).", className="text-secondary small mb-2"),
-            dcc.Graph(id="graf-curva-sigmoide", style={"height": "340px"}),
+                html.I(className="fa-solid fa-chart-line me-2", style={"color": THEME["cyan"]}),
+                html.Span("Curva de Probabilidad Logística", className="panel-header-badge")
+            ], className="mb-2"),
+            html.Small(f"Clasificación binaria de riesgo definida para calificaciones ≤ {mediana_puntaje:.1f} pts (mediana poblacional).", className="text-muted d-block mb-2"),
+            dcc.Graph(id="graf-curva-sigmoide", style={"height": "320px"}),
             html.Div(id="metricas-logistica-card", className="mt-2")
         ])), md=6),
     ], className="g-3"),
-], fluid=True, className="py-2")
+])
 
 # ---------------------------------------------------------------------------
-# 6. LAYOUT PRINCIPAL CON PESTAÑAS
+# 6. LAYOUT PRINCIPAL CON NAVEGACIÓN CAPSULE
 # ---------------------------------------------------------------------------
 
 app.layout = html.Div([
-    encabezado,
     dbc.Container([
+        hero_header,
         dbc.Tabs([
-            dbc.Tab(tab_contexto, label="Contexto & Resumen", tab_id="tab-contexto", label_class_name="fw-semibold"),
-            dbc.Tab(tab_exploracion, label="Exploración de Datos (EDA)", tab_id="tab-eda", label_class_name="fw-semibold"),
-            dbc.Tab(tab_hipotesis, label="Contraste de Hipótesis", tab_id="tab-hipotesis", label_class_name="fw-semibold"),
-            dbc.Tab(tab_regresion, label="Regresión & Modelado", tab_id="tab-regresion", label_class_name="fw-semibold"),
-            dbc.Tab(tab_simulador, label="Simulador & Diagnóstico", tab_id="tab-simulador", label_class_name="fw-semibold"),
-        ], id="tabs-navegacion", active_tab="tab-contexto", className="mb-3 custom-tabs"),
-    ], fluid=True, className="px-4"),
-    html.Footer(
-        dbc.Container([
+            dbc.Tab(tab_contexto, label="Contexto & Resumen", tab_id="tab-contexto", label_class_name="capsule-item"),
+            dbc.Tab(tab_exploracion, label="Exploración EDA", tab_id="tab-eda", label_class_name="capsule-item"),
+            dbc.Tab(tab_hipotesis, label="Contraste de Hipótesis", tab_id="tab-hipotesis", label_class_name="capsule-item"),
+            dbc.Tab(tab_regresion, label="Regresión & Modelado", tab_id="tab-regresion", label_class_name="capsule-item"),
+            dbc.Tab(tab_simulador, label="Simulador & Diagnóstico", tab_id="tab-simulador", label_class_name="capsule-item"),
+        ], id="tabs-navegacion", active_tab="tab-contexto", className="custom-capsule-tabs"),
+        
+        html.Footer([
             html.Div([
-                html.Span("Actividad de Transferencia — Programación para Ciencia de Datos II · Fundación Universitaria Compensar (2026)", className="small text-muted"),
-                html.Span("Autor: Michael Marín Herrera", className="small text-muted fw-bold")
-            ], className="d-flex justify-content-between align-items-center py-3 border-top mt-4")
-        ], fluid=True, className="px-4")
-    )
-], style={"backgroundColor": PALETA["fondo"], "minHeight": "100vh"})
+                html.Span("Actividad de Transferencia — Programación para Ciencia de Datos II · Fundación Universitaria Compensar", className="small text-muted"),
+                html.Span("Michael Marín Herrera (2026)", className="small fw-bold text-dark")
+            ], className="d-flex justify-content-between align-items-center py-4 border-top mt-5")
+        ])
+    ], fluid=False, style={"maxWidth": "1240px"})
+], style={"backgroundColor": "#F1F5F9", "minHeight": "100vh", "paddingTop": "1.5rem"})
 
 # ---------------------------------------------------------------------------
 # 7. CALLBACKS INTERACTIVOS
 # ---------------------------------------------------------------------------
 
-# Callback EDA: Slider Badge & Gráficos
+# Callback EDA
 @app.callback(
     [
         Output("badge-rango-sueno", "children"),
@@ -473,20 +530,20 @@ def actualizar_eda(rango_sueno, chk_outliers, color_var):
     # Histograma
     fig_hist = px.histogram(
         dff, x="puntaje", nbins=14,
-        title="Distribución del Puntaje de Rendimiento Académico",
-        color_discrete_sequence=[PALETA["primario"]],
+        title="Distribución de Rendimiento Académico",
+        color_discrete_sequence=[THEME["teal"]],
         labels={"puntaje": "Puntaje en Examen (0-100 pts)"}
     )
     media_val = dff["puntaje"].mean() if len(dff) > 0 else 0
     fig_hist.add_vline(
-        x=media_val, line_dash="dash", line_color=PALETA["peligro"],
+        x=media_val, line_dash="dash", line_color=THEME["coral"],
         annotation_text=f"Media: {media_val:.1f} pts", annotation_position="top left"
     )
-    figura_base(fig_hist)
+    chart_styler(fig_hist)
 
     # Dispersión
     color_label = "Nivel de Estrés (1-10)" if color_var == "nivel_estres" else "Horas de Estudio Semanales"
-    colorscale = "Reds" if color_var == "nivel_estres" else "Teal"
+    colorscale = "Thermal" if color_var == "nivel_estres" else "Teal"
 
     fig_disp = px.scatter(
         dff, x="horas_sueno", y="puntaje",
@@ -496,16 +553,16 @@ def actualizar_eda(rango_sueno, chk_outliers, color_var):
         labels={"horas_sueno": "Horas de Sueño Diarias", "puntaje": "Puntaje Académico", color_var: color_label},
         title=f"Sueño vs. Rendimiento (Color: {color_label})"
     )
-    fig_disp.update_traces(marker=dict(size=10, opacity=0.85, line=dict(width=1, color="white")))
+    fig_disp.update_traces(marker=dict(size=11, opacity=0.85, line=dict(width=1, color="white")))
 
-    # Resaltar atípico si aplica
+    # Resaltar atípico
     if "resaltar" in chk_outliers and 8 in dff.index:
-        row_atp = dff.loc[8] # ID 9
+        row_atp = dff.loc[8]
         fig_disp.add_trace(go.Scatter(
             x=[row_atp['horas_sueno']], y=[row_atp['puntaje']],
             mode="markers+text",
-            marker=dict(size=18, color="rgba(0,0,0,0)", line=dict(color=PALETA["peligro"], width=3)),
-            text=["⚠️ Estudiante Atípico (ID 9)"],
+            marker=dict(size=18, color="rgba(0,0,0,0)", line=dict(color=THEME["coral"], width=3)),
+            text=["⚠️ Atípico (ID 9)"],
             textposition="top right",
             name="Caso Atípico (ID 9)"
         ))
@@ -517,19 +574,19 @@ def actualizar_eda(rango_sueno, chk_outliers, color_var):
         fig_disp.add_trace(go.Scatter(
             x=x_line, y=m * x_line + b,
             mode="lines",
-            line=dict(color=PALETA["acento"], width=2.5, dash="dot"),
+            line=dict(color=THEME["violet"], width=2.5, dash="dot"),
             name=f"Tendencia (Pendiente: {m:+.2f})"
         ))
-    figura_base(fig_disp)
+    chart_styler(fig_disp)
 
-    # Resumen descriptivo
+    # Tabla descriptiva
     r_corr = np.corrcoef(dff['horas_sueno'], dff['puntaje'])[0, 1] if len(dff) > 1 else 0
     resumen = dbc.Row([
         dbc.Col([
-            html.H6("Resumen Descriptivo del Segmento Seleccionado", className="fw-bold mb-2"),
+            html.H6("Resumen Estadístico Descriptivo (Muestra Filtrada)", className="fw-bold mb-2 small text-uppercase"),
             html.Table([
                 html.Thead(html.Tr([
-                    html.Th("Variable"), html.Th("Media ± Desv."), html.Th("Mínimo"), html.Th("Mediana"), html.Th("Máximo")
+                    html.Th("Variable"), html.Th("Media ± Desv."), html.Th("Mín"), html.Th("Mediana"), html.Th("Máx")
                 ])),
                 html.Tbody([
                     html.Tr([html.Td("Horas de Sueño"), html.Td(f"{dff['horas_sueno'].mean():.2f} ± {dff['horas_sueno'].std():.2f}"), html.Td(f"{dff['horas_sueno'].min():.2f}"), html.Td(f"{dff['horas_sueno'].median():.2f}"), html.Td(f"{dff['horas_sueno'].max():.2f}")]),
@@ -537,13 +594,13 @@ def actualizar_eda(rango_sueno, chk_outliers, color_var):
                     html.Tr([html.Td("Nivel de Estrés"), html.Td(f"{dff['nivel_estres'].mean():.2f} ± {dff['nivel_estres'].std():.2f}"), html.Td(f"{dff['nivel_estres'].min():.1f}"), html.Td(f"{dff['nivel_estres'].median():.1f}"), html.Td(f"{dff['nivel_estres'].max():.1f}")]),
                     html.Tr([html.Td("Puntaje Rendimiento"), html.Td(f"{dff['puntaje'].mean():.2f} ± {dff['puntaje'].std():.2f}"), html.Td(f"{dff['puntaje'].min():.1f}"), html.Td(f"{dff['puntaje'].median():.1f}"), html.Td(f"{dff['puntaje'].max():.1f}")]),
                 ])
-            ], className="table table-sm table-modern")
+            ], className="table table-sm table-neuro")
         ], md=8),
         dbc.Col([
             html.Div([
-                html.Div("Correlación de Pearson en muestra:", className="small text-muted"),
-                html.Div(f"r = {r_corr:+.3f}", className="fw-bold fs-4", style={"color": PALETA["primario"]}),
-                html.Small("Asociación positiva: mayor sueño se relaciona con mejor calificación.", className="text-secondary d-block mt-1")
+                html.Div("Correlación de Pearson:", className="small text-muted text-uppercase fw-bold"),
+                html.Div(f"r = {r_corr:+.3f}", className="fw-bold fs-3", style={"color": THEME["teal"]}),
+                html.Small("Existe asociación directa y estadísticamente consistente entre el hábito de sueño y la calificación.", className="text-secondary d-block mt-1")
             ], className="p-3 bg-light rounded border h-100 d-flex flex-column justify-content-center")
         ], md=4)
     ], className="g-3")
@@ -569,15 +626,13 @@ def actualizar_hipotesis(percentil, alpha, modo_outlier):
         data_hip = data_hip.drop(index=outlier_idx)
 
     corte = float(np.percentile(data_hip['horas_sueno'], percentil))
-    data_hip['Grupo'] = np.where(data_hip['horas_sueno'] >= corte, f"Alto Sueño (≥ {corte:.2f} hrs)", f"Bajo Sueño (< {corte:.2f} hrs)")
+    data_hip['Grupo'] = np.where(data_hip['horas_sueno'] >= corte, f"Alto Sueño (≥ {corte:.2f}h)", f"Bajo Sueño (< {corte:.2f}h)")
 
     grupo_alto = data_hip[data_hip['horas_sueno'] >= corte]['puntaje']
     grupo_bajo = data_hip[data_hip['horas_sueno'] < corte]['puntaje']
 
-    # Pruebas estadísticas
     t_stat, p_dos_colas = stats.ttest_ind(grupo_alto, grupo_bajo, equal_var=False)
     p_val_welch = p_dos_colas / 2 if t_stat > 0 else 1.0 - (p_dos_colas / 2)
-
     u_stat, p_val_mwu = stats.mannwhitneyu(grupo_alto, grupo_bajo, alternative='greater')
 
     # Boxplot
@@ -585,22 +640,21 @@ def actualizar_hipotesis(percentil, alpha, modo_outlier):
         data_hip, x="Grupo", y="puntaje", color="Grupo",
         points="all",
         color_discrete_map={
-            f"Alto Sueño (≥ {corte:.2f} hrs)": PALETA["primario"],
-            f"Bajo Sueño (< {corte:.2f} hrs)": PALETA["warning"]
+            f"Alto Sueño (≥ {corte:.2f}h)": THEME["teal"],
+            f"Bajo Sueño (< {corte:.2f}h)": THEME["amber"]
         },
-        title=f"Comparación de Puntajes por Cohorte de Sueño (Corte P{percentil}: {corte:.2f} hrs)",
-        labels={"puntaje": "Puntaje Obtenido"}
+        title=f"Distribución de Calificaciones por Cohorte de Sueño (Corte P{percentil}: {corte:.2f} hrs)",
+        labels={"puntaje": "Calificación Obtenida (0-100 pts)"}
     )
-    figura_base(fig_box)
+    chart_styler(fig_box)
 
-    # Conclusión
     rechaza = (p_val_welch < alpha)
     resultado_ui = dbc.Row([
         dbc.Col([
             html.Div([
                 html.Span(f"Prueba t de Welch (Unilateral): t = {t_stat:.4f} | p-valor = {p_val_welch:.5f}", className="fw-bold d-block"),
-                html.Span(f"Prueba U de Mann-Whitney (No paramétrica): U = {u_stat:.1f} | p-valor = {p_val_mwu:.5f}", className="small text-muted d-block mt-1"),
-                html.Small(f"Nivel de significancia fijado: α = {alpha} | Muestra Alto: n={len(grupo_alto)} (Media={grupo_alto.mean():.2f}), Bajo: n={len(grupo_bajo)} (Media={grupo_bajo.mean():.2f})", className="text-secondary d-block mt-1")
+                html.Span(f"Prueba U de Mann-Whitney (No Paramétrica): U = {u_stat:.1f} | p-valor = {p_val_mwu:.5f}", className="small text-muted d-block mt-1"),
+                html.Small(f"Nivel fijado: α = {alpha} | n(Alto)={len(grupo_alto)} (Media={grupo_alto.mean():.2f}), n(Bajo)={len(grupo_bajo)} (Media={grupo_bajo.mean():.2f})", className="text-secondary d-block mt-1")
             ])
         ], md=8),
         dbc.Col([
@@ -609,10 +663,10 @@ def actualizar_hipotesis(percentil, alpha, modo_outlier):
                 html.Div(
                     "Rechazar H₀ a favor de H₁" if rechaza else "No se rechaza H₀",
                     className="fw-bold fs-6",
-                    style={"color": PALETA["exito"] if rechaza else PALETA["peligro"]}
+                    style={"color": THEME["emerald"] if rechaza else THEME["coral"]}
                 ),
                 html.Small(
-                    "Evidencia significativa: Dormir adecuadamente incrementa el rendimiento." if rechaza else "No hay evidencia suficiente al nivel α seleccionado.",
+                    "Evidencia concluyente: El mayor descanso incrementa significativamente el rendimiento." if rechaza else "No existe evidencia estadística suficiente para el nivel α seleccionado.",
                     className="text-muted d-block"
                 )
             ], className="text-md-end")
@@ -640,11 +694,7 @@ def actualizar_regresion(tipo_modelo, test_size, modo_outlier):
     if modo_outlier == "sin" and len(outlier_idx) > 0:
         data_reg = data_reg.drop(index=outlier_idx)
 
-    if tipo_modelo == "simple":
-        cols = ['horas_sueno']
-    else:
-        cols = ['horas_sueno', 'horas_estudio', 'nivel_estres']
-
+    cols = ['horas_sueno'] if tipo_modelo == "simple" else ['horas_sueno', 'horas_estudio', 'nivel_estres']
     X = data_reg[cols].to_numpy()
     y = data_reg[TARGET].to_numpy()
 
@@ -670,50 +720,49 @@ def actualizar_regresion(tipo_modelo, test_size, modo_outlier):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     mae = mean_absolute_error(y_test, y_pred)
 
-    # Gráfica Real vs Predicho
+    # Dispersión Real vs Predicho
     fig_pred = go.Figure()
     fig_pred.add_trace(go.Scatter(
         x=y_test, y=y_pred,
         mode="markers",
-        marker=dict(size=11, color=PALETA["primario"], opacity=0.8, line=dict(color="white", width=1.5)),
-        name="Estudiantes (Test)"
+        marker=dict(size=12, color=THEME["cyan"], opacity=0.85, line=dict(color=THEME["midnight"], width=1.5)),
+        name="Estudiantes en Test"
     ))
     min_val, max_val = min(y_test.min(), y_pred.min()) - 2, max(y_test.max(), y_pred.max()) + 2
     fig_pred.add_trace(go.Scatter(
         x=[min_val, max_val], y=[min_val, max_val],
         mode="lines",
-        line=dict(color=PALETA["peligro"], dash="dash", width=2),
-        name="Predicción Perfecta (y = x)"
+        line=dict(color=THEME["coral"], dash="dash", width=2),
+        name="Ajuste Ideal (y = x)"
     ))
     fig_pred.update_layout(
-        title="<b>Valores Reales vs. Predichos en Conjunto de Prueba</b>",
-        xaxis_title="Puntaje Real", yaxis_title="Puntaje Predicho"
+        title="<b>Valores Reales vs. Predichos (Conjunto de Evaluación)</b>",
+        xaxis_title="Calificación Real", yaxis_title="Calificación Predicha"
     )
-    figura_base(fig_pred)
+    chart_styler(fig_pred)
 
-    # Gráfica Coeficientes
-    coef_df = pd.DataFrame({"Variable": cols, "Coeficiente": coefs})
+    # Coeficientes
+    coef_df = pd.DataFrame({"Variable": cols, "Impacto": coefs})
     fig_coefs = px.bar(
-        coef_df, x="Variable", y="Coeficiente",
-        color="Coeficiente",
-        color_continuous_scale="Tealgrn",
-        title="<b>Magnitud de Coeficientes de Impacto</b>",
+        coef_df, x="Variable", y="Impacto",
+        color="Impacto",
+        color_continuous_scale="Darkmint",
+        title="<b>Magnitud de Coeficientes de Regresión</b>",
         text_auto=".2f"
     )
-    figura_base(fig_coefs)
+    chart_styler(fig_coefs)
 
-    # Métricas UI
     card_ui = dbc.Row([
-        dbc.Col(kpi_card("R² de Ajuste (Test)", f"{r2:.3f}", "Proporción de varianza explicada", PALETA["primario"]), md=3),
-        dbc.Col(kpi_card("Error RMSE", f"{rmse:.2f} pts", "Desviación estándar de residuos", PALETA["warning"]), md=3),
-        dbc.Col(kpi_card("Error MAE", f"{mae:.2f} pts", "Error medio absoluto", PALETA["secundario"]), md=3),
-        dbc.Col(kpi_card("Intercepto (b₀)", f"{intercept:.2f}", f"{len(cols)} variables en modelo", PALETA["acento"]), md=3),
+        dbc.Col(neuro_kpi("R² Bondad de Ajuste", f"{r2:.3f}", "Varianza explicada en test", "fa-solid fa-chart-pie", "#ECFEFF", THEME["cyan"]), md=3),
+        dbc.Col(neuro_kpi("Error RMSE", f"{rmse:.2f} pts", "Desviación estándar residual", "fa-solid fa-calculator", "#FFFBEB", THEME["amber"]), md=3),
+        dbc.Col(neuro_kpi("Error MAE", f"{mae:.2f} pts", "Error absoluto medio", "fa-solid fa-bullseye", "#F0FDF4", THEME["emerald"]), md=3),
+        dbc.Col(neuro_kpi("Intercepto b₀", f"{intercept:.2f}", f"Modelo: {tipo_modelo.upper()}", "fa-solid fa-sliders", "#EEF2FF", THEME["violet"]), md=3),
     ], className="g-3")
 
     return fig_pred, fig_coefs, card_ui
 
 
-# Callback Simulador & Clasificación de Riesgo
+# Callback Simulador
 @app.callback(
     [
         Output("resultado-simulador-card", "children"),
@@ -727,41 +776,34 @@ def actualizar_regresion(tipo_modelo, test_size, modo_outlier):
     ]
 )
 def actualizar_simulador(sueno, estudio, estres):
-    # Predicción lineal múltiple
     X_input = np.array([[sueno, estudio, estres]])
-    puntaje_pred = float(modelo_multiple_ref.predict(X_input)[0])
-    puntaje_pred = float(np.clip(puntaje_pred, 0, 100))
-
-    # Predicción logística
+    puntaje_pred = float(np.clip(modelo_multiple_ref.predict(X_input)[0], 0, 100))
     prob_riesgo = float(modelo_logit_ref.predict_proba(X_input)[0, 1])
 
-    # UI del simulador
     es_riesgo = (prob_riesgo >= 0.50)
-    color_diagnostico = PALETA["peligro"] if es_riesgo else PALETA["exito"]
 
     sim_ui = html.Div([
-        dbc.Row([
-            dbc.Col([
-                html.Div("Puntaje Estimado", className="small text-muted text-uppercase fw-bold"),
-                html.Div(f"{puntaje_pred:.1f} / 100 pts", className="fs-3 fw-bold", style={"color": PALETA["primario"]}),
-            ], md=6),
-            dbc.Col([
-                html.Div("Probabilidad de Riesgo", className="small text-muted text-uppercase fw-bold"),
-                html.Div(f"{prob_riesgo:.1%}", className="fs-3 fw-bold", style={"color": color_diagnostico}),
-            ], md=6),
-        ], className="text-center p-3 bg-white rounded border mb-3"),
         html.Div([
-            html.Div(f"Diagnóstico: {'ALERTA - Alto Riesgo Académico' if es_riesgo else 'ÓPTIMO - Desempeño Favorable'}", className="fw-bold mb-1"),
+            html.Div("CALIFICACIÓN ESTIMADA PROYECTADA", className="small fw-bold text-white-50 text-uppercase"),
+            html.Div(f"{puntaje_pred:.1f} pts", className="score-huge-value"),
+            html.Div(f"Probabilidad de Riesgo Académico: {prob_riesgo:.1%}", className="small fw-semibold text-white")
+        ], className="score-display-card mb-3"),
+
+        html.Div([
+            html.Div(
+                "⚠️ ALERTA: Perfil Estudiantil en Riesgo de Bajo Rendimiento" if es_riesgo else "✅ ÓPTIMO: Perfil Protector de Alto Rendimiento",
+                className="fw-bold mb-1"
+            ),
             html.Small(
-                f"El estudiante tiene una probabilidad del {prob_riesgo:.1%} de ubicarse por debajo de la mediana ({mediana_puntaje:.1f} pts). Se sugiere reforzar hábitos de sueño y control de estrés."
+                f"La combinación de sueño insuficiente ({sueno:.1f}h) y estrés ({estres}/10) proyecta una probabilidad del {prob_riesgo:.1%} de quedar por debajo de la mediana ({mediana_puntaje:.1f} pts)."
                 if es_riesgo else
-                f"El perfil combina sueño y estudio adecuados con estrés manejable. Puntaje proyectado satisfactorio.",
+                f"El equilibrio entre horas de descanso ({sueno:.1f}h) y dedicación de estudio ({estudio:.1f}h) favorece un desempeño académico superior.",
                 className="d-block"
             )
-        ], className="risk-card-high" if es_riesgo else "risk-card-low")
+        ], className="risk-alert-critical" if es_riesgo else "risk-alert-optimal")
     ])
 
-    # Curva sigmoide (variando horas de sueño con estudio y estrés fijos)
+    # Curva sigmoide
     rango_sueno_curva = np.linspace(3, 10, 80)
     X_curva = np.column_stack([rango_sueno_curva, np.full(80, estudio), np.full(80, estres)])
     probs_curva = modelo_logit_ref.predict_proba(X_curva)[:, 1]
@@ -770,32 +812,31 @@ def actualizar_simulador(sueno, estudio, estres):
     fig_sigmoide.add_trace(go.Scatter(
         x=rango_sueno_curva, y=probs_curva,
         mode="lines",
-        line=dict(color=PALETA["primario"], width=3),
-        name="Curva de Probabilidad de Riesgo"
+        line=dict(color=THEME["violet"], width=3),
+        name="P(Riesgo) vs. Sueño"
     ))
     fig_sigmoide.add_trace(go.Scatter(
         x=[sueno], y=[prob_riesgo],
         mode="markers",
-        marker=dict(size=14, color=color_diagnostico, line=dict(color="white", width=2)),
+        marker=dict(size=14, color=THEME["coral"] if es_riesgo else THEME["emerald"], line=dict(color="white", width=2)),
         name="Estudiante Simulado"
     ))
-    fig_sigmoide.add_hline(y=0.5, line_dash="dot", line_color=PALETA["muted"], annotation_text="Umbral de Riesgo (50%)")
+    fig_sigmoide.add_hline(y=0.5, line_dash="dot", line_color=THEME["muted"], annotation_text="Corte 50%")
     fig_sigmoide.update_layout(
-        title="<b>Curva Sigmoide: Probabilidad de Riesgo vs. Horas de Sueño</b>",
+        title="<b>Curva Sigmoide de Riesgo vs. Horas de Sueño</b>",
         xaxis_title="Horas de Sueño Diarias",
-        yaxis_title="Probabilidad P(Riesgo)",
+        yaxis_title="Probabilidad de Riesgo P(Y=1)",
         yaxis=dict(range=[-0.05, 1.05])
     )
-    figura_base(fig_sigmoide)
+    chart_styler(fig_sigmoide)
 
-    # Métricas del modelo de clasificación
     preds_pob = modelo_logit_ref.predict(X_full)
     acc = accuracy_score(df['en_riesgo'], preds_pob)
     prec = precision_score(df['en_riesgo'], preds_pob, zero_division=0)
     rec = recall_score(df['en_riesgo'], preds_pob, zero_division=0)
 
     metricas_log_ui = html.Div([
-        html.Span(f"Accuracy Global: {acc:.1%} | Precision: {prec:.2f} | Recall: {rec:.2f}", className="small fw-semibold text-muted d-block text-center")
+        html.Span(f"Exactitud Global (Accuracy): {acc:.1%} | Precisión: {prec:.2f} | Sensibilidad (Recall): {rec:.2f}", className="small fw-semibold text-muted d-block text-center")
     ])
 
     return sim_ui, fig_sigmoide, metricas_log_ui

@@ -1,225 +1,395 @@
 /* ==========================================================================
-   DASHBOARD DESIGN SYSTEM - CLINICAL ACADEMIC & MODERN SLATE THEME
+   NEURO-COGNITIVE & CIRCADIAN ANALYTICS DESIGN SYSTEM
+   Identidad visual: Deep Circadian Slate, Electric Teal & Sunset Coral
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
-    --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Space Grotesk', sans-serif;
     
-    --bg-app: #F8FAFC;
-    --bg-card: #FFFFFF;
-    --border-card: #E2E8F0;
+    /* Paleta Circadiana Única */
+    --bg-main: #F1F5F9;
+    --bg-surface: #FFFFFF;
+    --bg-surface-elevated: #F8FAFC;
     
-    --color-text-main: #0F172A;
-    --color-text-muted: #64748B;
+    --color-midnight: #0F172A;
+    --color-deep-space: #1E1B4B;
+    --color-cyan-glow: #06B6D4;
+    --color-teal-circadian: #0D9488;
+    --color-violet-sleep: #6366F1;
+    --color-sunset-stress: #F43F5E;
+    --color-amber-alert: #F59E0B;
+    --color-emerald-pass: #10B981;
     
-    --color-primary: #059669;
-    --color-primary-light: #ECFDF5;
-    --color-secondary: #0EA5E9;
-    --color-success: #10B981;
-    --color-danger: #EF4444;
-    --color-warning: #F59E0B;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
+    
+    --border-subtle: #E2E8F0;
+    --border-card: #CBD5E1;
     
     --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-pill: 9999px;
     
-    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-    --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
-    --shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
+    --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    --shadow-card: 0 10px 30px -4px rgba(15, 23, 42, 0.08);
+    --shadow-glow-teal: 0 0 25px rgba(13, 148, 136, 0.25);
+    --shadow-glow-violet: 0 0 25px rgba(99, 102, 241, 0.25);
 }
 
 body {
-    background-color: var(--bg-app);
-    font-family: var(--font-primary);
-    color: var(--color-text-main);
+    background-color: var(--bg-main);
+    font-family: var(--font-sans);
+    color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
 }
 
-/* --- Header / Navbar --- */
-.app-header {
-    background: linear-gradient(135deg, #064E3B 0%, #047857 50%, #059669 100%) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 20px rgba(5, 150, 105, 0.18);
-    padding: 1.1rem 0;
-}
-
-.brand-badge {
-    background: rgba(255, 255, 255, 0.2);
-    color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    display: inline-block;
-}
-
-/* --- Navigation Tabs --- */
-.nav-tabs {
-    border-bottom: 2px solid #E2E8F0;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.nav-tabs .nav-item {
-    margin-bottom: -2px;
-}
-
-.nav-tabs .nav-link {
-    border: none !important;
-    border-bottom: 2px solid transparent !important;
-    color: var(--color-text-muted);
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    transition: all 0.2s ease-in-out;
-    background: transparent;
-    display: flex;
-    align-items: center;
-}
-
-.nav-tabs .nav-link:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-light);
-}
-
-.nav-tabs .nav-link.active {
-    color: var(--color-primary) !important;
-    border-bottom: 2px solid var(--color-primary) !important;
-    background: var(--color-primary-light) !important;
-    font-weight: 700;
-}
-
-/* --- Cards & Containers --- */
-.card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card) !important;
-    border-radius: var(--radius-lg) !important;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.card:hover {
-    box-shadow: var(--shadow-hover);
-}
-
-.card-title-modern {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--color-text-main);
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
     letter-spacing: -0.02em;
 }
 
-/* --- KPI Cards --- */
-.kpi-card {
-    border: 1px solid var(--border-card) !important;
-    border-radius: var(--radius-lg) !important;
-    background: var(--bg-card);
+/* ==========================================================================
+   HERO / BANNER PRINCIPAL (ESTILO NEURO-ACADÉMICO)
+   ========================================================================== */
+.neuro-hero {
+    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 40%, #0F766E 100%);
+    border-radius: var(--radius-lg);
+    padding: 2.2rem 2.5rem;
+    color: #FFFFFF;
     position: relative;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.35);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.kpi-card::before {
+.neuro-hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(99, 102, 241, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.hero-tag {
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.4);
+    color: #67E8F9;
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.8rem;
+}
+
+.hero-title {
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+    color: #FFFFFF !important;
+}
+
+.hero-subtitle {
+    font-size: 0.95rem;
+    color: #CBD5E1;
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
+.hero-author-badge {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: 0.8rem 1.2rem;
+    display: inline-flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+/* ==========================================================================
+   NAVEGACIÓN POR PESTAÑAS (SEGMENTED CAPSULE BAR)
+   ========================================================================== */
+.custom-capsule-tabs {
+    background: #FFFFFF;
+    padding: 6px;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 2rem !important;
+}
+
+.custom-capsule-tabs .nav-item {
+    flex: 1;
+    text-align: center;
+    margin: 0 2px;
+}
+
+.custom-capsule-tabs .nav-link {
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.custom-capsule-tabs .nav-link:hover {
+    color: var(--color-deep-space) !important;
+    background: #F1F5F9;
+}
+
+.custom-capsule-tabs .nav-link.active {
+    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   NEURO-STAT / KPI CARDS
+   ========================================================================== */
+.neuro-kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.neuro-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card);
+    border-color: #CBD5E1;
+}
+
+.kpi-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.kpi-icon-pill {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+
+.kpi-badge-indicator {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+}
+
+.kpi-number-display {
+    font-family: var(--font-heading);
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.kpi-label-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0;
+}
+
+.kpi-footer-subtext {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border-subtle);
+}
+
+/* ==========================================================================
+   TARJETAS Y PANELES GENERALES
+   ========================================================================== */
+.card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.25s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-card);
+}
+
+.panel-header-badge {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-header-badge i {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   SIMULADOR & CALCULADORA CLÍNICA
+   ========================================================================== */
+.simulator-box {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    padding: 1.5rem;
+}
+
+.score-display-card {
+    background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    color: #FFFFFF;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-display-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: var(--kpi-color, var(--color-primary));
+    height: 3px;
+    background: linear-gradient(90deg, #06B6D4, #10B981, #F43F5E);
 }
 
-.kpi-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-}
-
-.kpi-titulo {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700;
-    color: var(--color-text-muted);
-    margin-bottom: 0.35rem;
-}
-
-.kpi-valor {
-    font-size: 1.8rem;
+.score-huge-value {
+    font-family: var(--font-heading);
+    font-size: 3rem;
     font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 0.25rem;
-    line-height: 1.1;
+    color: #67E8F9;
+    line-height: 1;
+    margin: 0.4rem 0;
 }
 
-.kpi-subtitulo {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0;
-    font-weight: 500;
-}
-
-/* --- Risk Cards --- */
-.risk-card-high {
-    background-color: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-left: 5px solid #EF4444;
-    padding: 1rem;
-    border-radius: var(--radius-sm);
-    color: #991B1B;
-}
-
-.risk-card-low {
-    background-color: #F0FDF4;
-    border: 1px solid #BBF7D0;
+.risk-alert-optimal {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
     border-left: 5px solid #10B981;
-    padding: 1rem;
     border-radius: var(--radius-sm);
-    color: #166534;
+    padding: 1rem 1.2rem;
+    color: #065F46;
 }
 
-/* --- Form Controls & Dash Components --- */
-label {
-    color: var(--color-text-main);
-    font-size: 0.875rem;
+.risk-alert-critical {
+    background: #FFF1F2;
+    border: 1px solid #FECDD3;
+    border-left: 5px solid #F43F5E;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
+    color: #881337;
 }
 
-.Select-control {
-    border-radius: var(--radius-md) !important;
-    border-color: var(--border-card) !important;
-    font-family: var(--font-primary) !important;
+/* ==========================================================================
+   CONTROLES, SLIDERS Y FORMULARIOS
+   ========================================================================== */
+.control-drawer {
+    background: #FFFFFF;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-soft);
 }
 
 .rc-slider-track {
-    background-color: var(--color-primary) !important;
+    background: linear-gradient(90deg, #0D9488 0%, #06B6D4 100%) !important;
 }
 
 .rc-slider-handle {
-    border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2) !important;
+    border: 2px solid #0F172A !important;
+    background-color: #06B6D4 !important;
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.25) !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-top: -7px !important;
 }
 
 .rc-slider-dot-active {
-    border-color: var(--color-primary) !important;
+    border-color: #06B6D4 !important;
 }
 
-/* --- Table Modern --- */
-.table-modern {
+/* Tablas */
+.table-neuro {
     width: 100%;
     margin-bottom: 0;
 }
 
-.table-modern td, .table-modern th {
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--border-card);
-    font-size: 0.875rem;
+.table-neuro th {
+    background-color: #F8FAFC;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid var(--border-subtle);
 }
 
-.table-modern tr:last-child td {
+.table-neuro td {
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+}
+
+.table-neuro tr:last-child td {
     border-bottom: none;
 }
