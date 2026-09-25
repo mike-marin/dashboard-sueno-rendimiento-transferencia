@@ -5,7 +5,6 @@ PROGRAMACIÓN PARA CIENCIA DE DATOS II - FUNDACIÓN UNIVERSITARIA COMPENSAR
 
 ESTUDIANTE(S):
 - Nombre: Michael Marín Herrera
-- Correo institucional: mmarinh@ucompensar.edu.co
 - Programa: Ingeniería en Ciencia de Datos
 
 DOCENTE:

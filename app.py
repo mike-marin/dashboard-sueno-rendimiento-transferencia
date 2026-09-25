@@ -4,7 +4,7 @@ Dashboard - Actividad de Transferencia: Sueño, Estrés y Rendimiento Académico
 Programación para Ciencia de Datos II - Fundación Universitaria Compensar
 
 Identidad Visual: Neuro-Circadian Analytics & Deep Slate
-Autor: Michael Marín Herrera (mmarinh@ucompensar.edu.co)
+Autor: Michael Marín Herrera
 Docente: William Eduardo Clavijo Bohorquez
 """
 
@@ -168,7 +168,7 @@ hero_header = html.Div([
             html.Div([
                 html.Div("ACTIVIDAD DE TRANSFERENCIA", className="small fw-bold text-uppercase", style={"color": "#67E8F9", "letterSpacing": "0.06em"}),
                 html.Div("Michael Marín Herrera", className="fs-6 fw-bold text-white mt-1"),
-                html.Small("mmarinh@ucompensar.edu.co", className="text-white-50 font-monospace d-block"),
+                html.Small("Ingeniería en Ciencia de Datos", className="text-white-50 d-block"),
                 html.Small("Docente: William E. Clavijo Bohorquez", className="text-white-50 mt-1 d-block")
             ], className="hero-author-badge")
         ], md=4, className="d-flex justify-content-md-end align-items-center mt-3 mt-md-0")

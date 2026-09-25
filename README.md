@@ -9,7 +9,7 @@
 **Actividad de Transferencia** — *Programación para Ciencia de Datos II*  
 **Fundación Universitaria Compensar** — Ingeniería en Ciencia de Datos (2026)  
 
-- **Autor:** Michael Marín Herrera (`mmarinh@ucompensar.edu.co`)  
+- **Autor:** Michael Marín Herrera  
 - **Docente:** William Eduardo Clavijo Bohorquez  
 
 ---
