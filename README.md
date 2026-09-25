@@ -1,4 +1,4 @@
-# 🧠 Dashboard — Sueño, Estrés y Rendimiento Académico
+# Dashboard — Sueño, Estrés y Rendimiento Académico
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Dash](https://img.shields.io/badge/Dash-2.17.1-008DE4?logo=plotly&logoColor=white)](https://dash.plotly.com/)
@@ -14,7 +14,7 @@
 
 ---
 
-## 📁 Contenido del Repositorio
+## Contenido del Repositorio
 
 ```text
 proyecto/
@@ -32,7 +32,7 @@ proyecto/
 
 ---
 
-## 1. 💻 Ejecutar el Dashboard en su Computador
+## 1. Ejecutar el Dashboard en su Computador
 
 1. Abra una terminal en la carpeta del proyecto.
 2. (Opcional recomendado) Cree y active un entorno virtual:
@@ -58,19 +58,19 @@ proyecto/
 
 ---
 
-## 2. 🌐 Publicar y Ver el Dashboard en Binder
+## 2. Publicar y Ver el Dashboard en Binder
 
 1. Vaya a **[https://mybinder.org](https://mybinder.org)**
 2. En **GitHub repository name or URL**, pegue la URL de su repositorio:
    `https://github.com/mike-marin/dashboard-sueno-rendimiento-transferencia`
 3. Deje la rama en `main`.
 4. En **Path to a notebook file (optional)** seleccione **File** y escriba `dashboard_binder.ipynb`.
-5. Haga clic en **Launch** 🚀.
-6. Una vez abra el cuaderno en Binder, en el menú superior haga clic en **Run → Run All Cells**. El dashboard interactivo se desplegará de inmediato dentro del cuaderno y con enlace a pantalla completa.
+5. Haga clic en **Launch**.
+6. Una vez abra el cuaderno en Binder, en el menú superior haga clic en **Run → Run All Cells**. El dashboard interactivo se desplegará dentro del cuaderno y con enlace a pantalla completa.
 
 ---
 
-## 📊 Funcionalidades del Dashboard
+## 3. Funcionalidades del Dashboard
 
 El dashboard cuenta con 5 pestañas analíticas:
 
