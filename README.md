@@ -1,112 +1,81 @@
-# 🧠 Dashboard Interactivo: Sueño y Rendimiento Académico
+# 🧠 Dashboard — Sueño, Estrés y Rendimiento Académico
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.36.0-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![Plotly](https://img.shields.io/badge/Plotly-Interactive_Charts-3F4F75?logo=plotly&logoColor=white)](https://plotly.com/)
-[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-Machine_Learning-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mike-marin/dashboard-sueno-rendimiento-transferencia/main)
+[![Dash](https://img.shields.io/badge/Dash-2.17.1-008DE4?logo=plotly&logoColor=white)](https://dash.plotly.com/)
+[![Plotly](https://img.shields.io/badge/Plotly-5.24.1-3F4F75?logo=plotly&logoColor=white)](https://plotly.com/)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.5.1-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mike-marin/dashboard-sueno-rendimiento-transferencia/main?urlpath=lab/tree/dashboard_binder.ipynb)
 
 **Actividad de Transferencia** — *Programación para Ciencia de Datos II*  
 **Fundación Universitaria Compensar** — Ingeniería en Ciencia de Datos (2026)  
 
-- **Autor:** Michael Marín Herrera (`mmarinh@ucompensar.edu.co`)
-- **Docente:** William Eduardo Clavijo Bohorquez
+- **Autor:** Michael Marín Herrera (`mmarinh@ucompensar.edu.co`)  
+- **Docente:** William Eduardo Clavijo Bohorquez  
 
 ---
 
-## 📁 Estructura del Repositorio
+## 📁 Contenido del Repositorio
 
 ```text
-sueno_rendimiento/
-├── assets/
-│   └── style.css                    # Estilos visuales personalizados (CSS)
+proyecto/
+├── app.py                   # Aplicación Dash (dashboard interactivo)
+├── dashboard_binder.ipynb   # Notebook para lanzar y ver el dashboard en Binder
+├── requirements.txt         # Dependencias de Python (Dash, Scikit-Learn, Proxy)
+├── runtime.txt              # Versión de Python para Binder (python-3.11)
 ├── data/
-│   └── sueno_rendimiento.csv        # Dataset original (70 estudiantes)
-├── .streamlit/
-│   └── config.toml                  # Configuración de tema visual (Emerald / Slate)
-├── .gitignore                       # Filtro de archivos locales/temporales
-├── README.md                        # Documentación principal del proyecto
-├── app.py                           # Punto de entrada complementario
-├── dashboard_binder.ipynb           # Notebook Jupyter reproducible para Binder / Colab
-├── dashboard_sueno_rendimiento.py   # Código de la aplicación interactiva Streamlit
-├── enlaces_entrega.txt              # Enlaces institucionales de entrega
-├── requirements.txt                 # Dependencias del proyecto
-└── runtime.txt                      # Versión de entorno para despliegue
+│   └── sueno_rendimiento.csv # Dataset con 70 estudiantes universitarios
+├── assets/
+│   └── estilos.css          # Estilos del dashboard (Dash carga esta carpeta automáticamente)
+├── enlaces_entrega.txt      # Formato de entrega del proyecto
+└── README.md
 ```
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto Localmente
+## 1. 💻 Ejecutar el Dashboard en su Computador
 
-Para ejecutar el dashboard en tu computadora (Windows / macOS / Linux), sigue estos sencillos pasos:
-
-### 1. (Opcional recomendado) Crear y activar un entorno virtual:
-- **Windows (PowerShell):**
-  ```powershell
-  python -m venv venv
-  .\venv\Scripts\activate
-  ```
-- **macOS / Linux:**
-  ```bash
-  python3 -m venv venv
-  source venv/bin/activate
-  ```
-
-### 2. Instalar las dependencias:
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Ejecutar el dashboard:
-```bash
-streamlit run dashboard_sueno_rendimiento.py
-```
-*(O también: `streamlit run app.py`)*
-
-El navegador se abrirá automáticamente en: **`http://localhost:8501`**
+1. Abra una terminal en la carpeta del proyecto.
+2. (Opcional recomendado) Cree y active un entorno virtual:
+   - **Windows (PowerShell):**
+     ```powershell
+     python -m venv venv
+     .\venv\Scripts\activate
+     ```
+   - **macOS / Linux:**
+     ```bash
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+3. Instale las dependencias:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Inicie la aplicación:
+   ```bash
+   python app.py
+   ```
+5. Abra el navegador en **http://127.0.0.1:8050**
 
 ---
 
-## 📊 Contenido y Funcionalidades del Dashboard
+## 2. 🌐 Publicar y Ver el Dashboard en Binder
 
-El dashboard cuenta con un panel lateral de filtros globales y **4 pestañas analíticas e interactivas**:
-
-1. **Filtros Globales (Sidebar):**
-   - Slider de rango de horas de sueño.
-   - Checkbox interactivo para incluir o excluir al estudiante atípico (ID=9, puntaje=22).
-
-2. **1. Resumen Exploratorio:**
-   - Tarjetas de KPIs analíticos ($n$, horas de sueño promedio, puntaje promedio, correlación $r$).
-   - Histograma de distribución de calificaciones con línea de referencia de la media.
-   - Diagrama de dispersión dinámico coloreado por horas de estudio o nivel de estrés.
-   - Tabla descriptiva completa con métricas estadísticas.
-
-3. **2. Contraste de Hipótesis:**
-   - Evaluación formal de:
-     $$\begin{cases} H_0: \mu_{\text{alto}} \le \mu_{\text{bajo}} \\ H_1: \mu_{\text{alto}} > \mu_{\text{bajo}} \end{cases}$$
-   - Pruebas estadísticas automáticas: **$t$ de Welch** y **Mann-Whitney $U$**.
-   - Sliders en vivo para variar el percentil de corte (10% al 90%) y el nivel de significancia $\alpha$.
-   - Gráficos boxplot comparativos y tarjeta de conclusión diagnóstica.
-
-4. **3. Regresión Lineal Múltiple:**
-   - Selección interactiva de variables predictoras (`horas_sueno`, `horas_estudio`, `nivel_estres`).
-   - Ajuste de proporción de partición de prueba (Train/Test Split).
-   - Métricas de desempeño en tiempo real: $R^2$ y RMSE.
-   - Gráfico interactivo de valores reales vs. predichos.
-   - **Simulador de Rendimiento Individual** en vivo.
-
-5. **4. Regresión Logística y Riesgo:**
-   - Definición de estudiantes en riesgo académico (puntaje $\le$ mediana).
-   - Ajuste de umbral de probabilidad de corte y parámetro de regularización $C$.
-   - Matriz de confusión visual interactiva y curva sigmoide de probabilidad.
-   - **Calculadora de Diagnóstico de Riesgo Estudiantil** individual.
+1. Vaya a **[https://mybinder.org](https://mybinder.org)**
+2. En **GitHub repository name or URL**, pegue la URL de su repositorio:
+   `https://github.com/mike-marin/dashboard-sueno-rendimiento-transferencia`
+3. Deje la rama en `main`.
+4. En **Path to a notebook file (optional)** seleccione **File** y escriba `dashboard_binder.ipynb`.
+5. Haga clic en **Launch** 🚀.
+6. Una vez abra el cuaderno en Binder, en el menú superior haga clic en **Run → Run All Cells**. El dashboard interactivo se desplegará de inmediato dentro del cuaderno y con enlace a pantalla completa.
 
 ---
 
-## 🌐 Despliegue en la Nube y Ejecución en Binder
+## 📊 Funcionalidades del Dashboard
 
-- **Streamlit Community Cloud:** Despliegue automático conectado con GitHub.
-- **Binder:** Abre el repositorio de manera interactiva sin instalar nada localmente haciendo clic en la insignia superior de Binder o en `dashboard_binder.ipynb`.
+El dashboard cuenta con 5 pestañas analíticas:
 
----
-© 2026 Michael Marín Herrera — Fundación Universitaria Compensar
+1. **Contexto & Resumen:** Tarjetas KPIs, resumen ejecutivo, planteamiento del problema institucional y diccionario de variables.
+2. **Exploración de Datos (EDA):** Slider de rango de horas de sueño, histograma de notas con línea de media, dispersograma interactivo (coloreado por nivel de estrés o horas de estudio) y tratamiento del caso atípico (ID=9, puntaje=22).
+3. **Contraste de Hipótesis:** Evaluación formal de $H_0: \mu_{\text{alto}} \le \mu_{\text{bajo}}$ vs. $H_1: \mu_{\text{alto}} > \mu_{\text{bajo}}$ con pruebas $t$ de Welch y Mann-Whitney $U$, selector de percentil de corte de sueño y nivel de significancia $\alpha$.
+4. **Regresión & Modelado:** Modelos de Regresión Lineal Simple, Regresión Múltiple y Regularización Ridge ($L_2$), ajuste de proporción de Test Split, cálculo en vivo de $R^2$, RMSE, MAE y gráfico real vs. predicho.
+5. **Simulador & Diagnóstico:** Calculadora interactiva individual en tiempo real (ajuste de sueño, estudio y estrés) para predecir puntaje y riesgo académico con modelo de clasificación logística y curva sigmoide.
