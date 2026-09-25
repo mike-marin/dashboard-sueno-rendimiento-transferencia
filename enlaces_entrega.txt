@@ -1,0 +1,29 @@
+====================================================================
+ACTIVIDAD DE TRANSFERENCIA: DASHBOARD SUEÑO Y RENDIMIENTO ACADÉMICO
+PROGRAMACIÓN PARA CIENCIA DE DATOS II - FUNDACIÓN UNIVERSITARIA COMPENSAR
+====================================================================
+
+ESTUDIANTE(S):
+- Nombre: Michael Marín Herrera
+- Correo institucional: mmarinh@ucompensar.edu.co
+- Programa: Ingeniería en Ciencia de Datos
+
+DOCENTE:
+- Nombre: William Eduardo Clavijo Bohorquez
+
+ENLACES DEL PROYECTO:
+1. Repositorio de GitHub:
+   https://github.com/mike-marin/dashboard-sueno-rendimiento-transferencia
+
+2. Aplicación Desplegada en la Nube (Streamlit Community Cloud):
+   https://sueno-rendimiento-academico.streamlit.app/
+
+3. Entorno Interactivo Binder / Colab (Opcional):
+   https://mybinder.org/v2/gh/mike-marin/dashboard-sueno-rendimiento-transferencia/main
+
+4. Video / Sustentación (si aplica):
+   [Insertar enlace de YouTube / Loom / OneDrive / Teams]
+
+====================================================================
+FECHA DE ENTREGA: 2026-09-24
+====================================================================
